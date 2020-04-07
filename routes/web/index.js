@@ -5,8 +5,8 @@ module.exports = app => {
     const applyProjects = require('./applyProjects')
 
     app.use('/web/api/user', user)
-    app.use('/web/api/projects', projects)
-    app.use('/web/api/authProjects', authProjects)
-    app.use('/web/api/applyProjects', applyProjects)
+    app.use('/web/api/project', projects)
+    app.use('/web/api/authProject', authProjects)
+    app.use('/web/api/applyProject', applyProjects)
 
 }
