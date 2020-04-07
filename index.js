@@ -1,18 +1,11 @@
 const express = require('express')
 const app = express()
+const errorHandler = require('./middlewares/error_middleware')
 
 //让express识别客户端Jason
 app.use(express.json())
 //允许跨域
 app.use(require('cors')())
-
-//错误处理中间件
-errorHandler = async (err, req, res, next) => {
-    res.status(err.statusCode || 500).send(
-        {
-            message: err.message
-        })
-}
 
 //前端请求路由
 require('./plugins/db')(app)
