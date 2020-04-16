@@ -12,7 +12,7 @@ const schema = new mongoose.Schema({
             return require('bcryptjs').hashSync(val, 10)
         }
     },
-    createdTime: { type: String },//注册时间
+    createdTime: { type: Date },//注册时间
     adminFlag: { type: Boolean, default: false },//管理员、普通用户状态
     welcomeFlag: { type: Boolean, default: true },
     address: { type: String },//用户地址
@@ -20,13 +20,13 @@ const schema = new mongoose.Schema({
     phone: {
         type: String, index: true, required: true
     },
-    email: { type: String },//邮箱
-    avatar: { type: String },//头像
+    email: { type: String, default: "" },//邮箱
+    img: { type: String, default: "https://cn.vuejs.org/images/logo.png" },//头像
     projects_id: { type: Array },//所拥有的项目的id列表
-    applyWaitProject_id: { type: Array },//正在申请查看项目id列表
-    authWaitProjects_id: { type: Array },//等待授权项目id列表
-    getAuthedProjects_id: { type: Array },//已获取授权项目id列表
-    getCheckedProjects_id: { type: Array }//已授权开放项目id列表
+    applyWaitProjects_id: { type: Array, default: [] },//正在申请查看项目id列表
+    authWaitProjects_id: { type: Array, default: [] },//等待授权项目id列表
+    getAuthedProjects_id: { type: Array, default: [] },//已获取授权项目id列表
+    getCheckedProjects_id: { type: Array, default: [] }//已授权开放项目id列表
 })
 
 module.exports = mongoose.model('User', schema)

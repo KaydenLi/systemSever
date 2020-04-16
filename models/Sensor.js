@@ -18,13 +18,13 @@ const schema = new mongoose.Schema({
                 ratio: { type: Number },
                 limit: { type: Number },
                 threshold: { type: Number },
-                position: { type: Array },
+                position: { type: String },
                 initialError: { type: Number },
                 name: { type: String },
                 type: { type: String },
-                group: { type: Array },
+                group: { type: Array, default: [] },
                 unit: { type: String },
-                value: { type: Array }
+                value: { type: Array, default: [] }
             }
         ]
     }]

@@ -8,7 +8,13 @@ const schema = new mongoose.Schema({
         type: String
     },//项目名称
     authed: { type: Boolean, default: false },
-    address: { type: String, default: "cn" },//项目地址
+    province: { type: String },
+    city: { type: String },
+    address: { type: String, default: "cn" },//项目详细地址
+    lng: { type: Number },//经度
+    lat: { type: Number },//纬度
+    obj: { type: String },//obj文件地址
+    mtl: { type: String },//mtl文件地址
     structuralType: { type: String },//结构类型
     createdTime: { type: Date },//创建时间
     openStatus: { type: Boolean, default: false },//开放状态
