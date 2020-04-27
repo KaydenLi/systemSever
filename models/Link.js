@@ -8,4 +8,4 @@ const schema = new mongoose.Schema({
     url: { type: String }
 })
 
-module.exports = mongoose.model('Link', schema)
+module.exports = mongoose.model('Link', schema, 'links')

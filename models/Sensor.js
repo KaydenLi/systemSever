@@ -24,10 +24,10 @@ const schema = new mongoose.Schema({
                 type: { type: String },
                 group: { type: Array, default: [] },
                 unit: { type: String },
-                value: { type: Array, default: [] }
+                value: { type: Array, default: [0,0,0,0,0,0,0,0,0,0] }
             }
         ]
     }]
 })
 
-module.exports = mongoose.model('Sensor', schema)
+module.exports = mongoose.model('Sensor', schema, 'sensors')

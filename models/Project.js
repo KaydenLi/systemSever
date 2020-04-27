@@ -18,7 +18,8 @@ const schema = new mongoose.Schema({
     structuralType: { type: String },//结构类型
     createdTime: { type: Date },//创建时间
     openStatus: { type: Boolean, default: false },//开放状态
-    watchersId: { type: Array, default: [] },//获得授权者
+    operationFlag: { type: Boolean, default: false },
+    watchersId: { type: Number, default: 0 },//获得授权者
     img: { type: String },//项目图片
     planeId: { type: Array },//测区
     baseInfo: [
@@ -31,4 +32,4 @@ const schema = new mongoose.Schema({
     ]
 })
 
-module.exports = mongoose.model('Project', schema)
+module.exports = mongoose.model('Project', schema, 'projects')

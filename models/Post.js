@@ -9,4 +9,4 @@ const schema = new mongoose.Schema({
     content: { type: String }
 })
 
-module.exports = mongoose.model('Post', schema)
+module.exports = mongoose.model('Post', schema, 'posts')

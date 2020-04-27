@@ -21,4 +21,4 @@ const schema = new mongoose.Schema({
     avatar: { type: String },//头像
 })
 
-module.exports = mongoose.model('Admin', schema)
+module.exports = mongoose.model('Admin', schema, 'admins')

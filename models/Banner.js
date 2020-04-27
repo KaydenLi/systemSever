@@ -6,7 +6,8 @@ const schema = new mongoose.Schema({
     title: { type: String },
     createTime: { type: Date },
     img: { type: String },
-    bgcolor: { type: String }
+    bgcolor: { type: String },
+    content: { type: String }
 })
 
-module.exports = mongoose.model('Banner', schema)
+module.exports = mongoose.model('Banner', schema, 'banners')
