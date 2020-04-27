@@ -1,4 +1,4 @@
-const User = require('../models/Users')
+const User = require('../models/User')
 //处理中断请求
 const assert = require('http-assert')
 //引如jsonwebtoken
