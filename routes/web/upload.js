@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express.Router();
 const multer = require('multer')
+const auth_middleware = require('../../middlewares/auth_middleware')
+
 // const assert = require('http-assert')
 
 const uploadimg = multer({ dest: __dirname + '/../../uploads/img' });

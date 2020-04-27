@@ -5,8 +5,7 @@ module.exports = app => {
     const link = require('./link')
     const banner = require('./banner')
     const upload = require('./upload')
-    const authProjects = require('./authProjects')
-    const applyProjects = require('./applyProjects')
+    const apply = require('./apply')
 
     app.use('/web/api/user', user)
     app.use('/web/api/project', projects)
@@ -14,7 +13,5 @@ module.exports = app => {
     app.use('/web/api/link', link)
     app.use('/web/api/banner', banner)
     app.use('/web/api/upload', upload)
-    app.use('/web/api/authProject', authProjects)
-    app.use('/web/api/applyProject', applyProjects)
-
+    app.use('/web/api/apply', apply)
 }

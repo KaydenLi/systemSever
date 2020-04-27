@@ -6,6 +6,7 @@ module.exports = app => {
     const user = require('./user')
     const project = require('./project')
     const admin = require('./admin')
+    const waiting = require('./waitingProject')
 
     app.use('/admin/api/post', post)
     app.use('/admin/api/upload', upload)
@@ -14,4 +15,5 @@ module.exports = app => {
     app.use('/admin/api/user', user)
     app.use('/admin/api/project', project)
     app.use('/admin/api/admin', admin)
+    app.use('/admin/api/waiting', waiting)
 }

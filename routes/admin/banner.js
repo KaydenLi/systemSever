@@ -1,32 +1,33 @@
 const express = require('express')
 const router = express.Router();
 const Banner = require('../../models/Banner')
+const auth_middleware = require('../../middlewares/admin_auth_middleware');
 
 // 创建轮播图
-router.post('/create', async (req, res) => {
+router.post('/create', auth_middleware, async (req, res) => {
     const banner = await Banner.create(req.body)
     res.send(banner)
 })
 // 轮播图列表
-router.get('/list', async (req, res) => {
-    const banners = await Banner.find()
+router.get('/list', auth_middleware, async (req, res) => {
+    const banners = await Banner.find().sort({ 'createTime': -1 });
     res.send(banners)
 })
 // 删除轮播图
-router.delete('/delete/:id', async (req, res) => {
+router.delete('/delete/:id', auth_middleware, async (req, res) => {
     let id = req.params.id;
     await Banner.findByIdAndDelete({ "_id": id })
-    const result = await Banner.find();
+    const result = await Banner.find().sort({ 'createTime': -1 });
     res.send(result)
 })
 // 获取轮播图
-router.get('/:id', async (req, res) => {
+router.get('/:id', auth_middleware, async (req, res) => {
     let id = req.params.id;
     const result = await Banner.findById({ "_id": id })
     res.send(result)
 })
 // 修改轮播图
-router.post('/update/:id', async (req, res) => {
+router.post('/update/:id', auth_middleware, async (req, res) => {
     let id = req.params.id;
     const result = await Banner.findByIdAndUpdate({ "_id": id }, req.body)
     res.send(result)

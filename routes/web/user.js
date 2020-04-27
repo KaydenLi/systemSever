@@ -1,10 +1,16 @@
 const express = require('express')
 const router = express.Router();
-const User = require('../../models/Users')
+const User = require('../../models/User')
 const jwt = require('jsonwebtoken')
 const assert = require('http-assert')
 const secret = require('../../secret')
+// ------------------
 
+router.get('/delete', async (req, res) => {
+    const result = await User.remove();
+    res.send(result)
+})
+// ------------------
 //创建用户
 router.post('/create', async (req, res) => {
     //判断用户是否存在
@@ -48,18 +54,11 @@ router.post('/update/:id', async (req, res) => {
     res.send(userInfo)
 })
 
-router.delete('/delete', async (req, res) => {
-    const result = await User.remove();
-    res.send(result)
-})
-
-router.get('/:id', async (req, res) => {
+// 获取用户信息
+router.get('/show/:id', async (req, res) => {
     const id = req.params.id;
-    res.send('user' + id)
-})
-
-router.get('/s', async (req, res) => {
-    res.send("hello world")
+    const user = await User.findOne({"_id":id},"userName email img")
+    res.send(user)
 })
 
 module.exports = router

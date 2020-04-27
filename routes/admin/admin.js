@@ -4,8 +4,9 @@ const Admin = require('../../models/Admin')
 const jwt = require('jsonwebtoken')
 const assert = require('http-assert')
 const secret = require('../../secret')
+const auth_middleware = require('../../middlewares/admin_auth_middleware');
 
-//创建用户
+//创建管理员
 router.post('/create', async (req, res) => {
     //判断用户是否存在
     const { userName, phone } = req.body
@@ -19,7 +20,7 @@ router.post('/create', async (req, res) => {
     res.send(newUser.userName)
 })
 
-//用户登录
+//管理员登录
 router.post('/login', async (req, res) => {
     const { phone, password } = req.body
     //根据用户名找到用户
@@ -34,22 +35,8 @@ router.post('/login', async (req, res) => {
     res.send({ userInfo, token })
 })
 //用户列表
-router.get('/list', async (req, res) => {
+router.get('/list', auth_middleware, async (req, res) => {
     const users = await Admin.find();
     res.send(users);
 })
-
-router.delete('/delete/:id', async (req, res) => {
-    let id = req.params.id;
-    const result = await Admin.findByIdAndDelete({ "_id": id });
-    assert(result, 500, "服务器错误");
-    const admins = await Admin.find();
-    res.send(admins)
-})
-
-router.get('/:id', async (req, res) => {
-    const id = req.params.id;
-    res.send('user' + id)
-})
-
 module.exports = router

@@ -1,12 +1,13 @@
 const express = require('express')
 const router = express.Router();
 const Project = require('../../models/Project')
-const User = require('../../models/Users')
+const User = require('../../models/User')
+const Apply = require('../../models/Apply')
 const Sensor = require('../../models/Sensor')
 const assert = require('http-assert')
 const auth_middleware = require('../../middlewares/auth_middleware')
 const has_project_auth_middleware = require('../../middlewares/has_project_auth')
-
+const WaitingProject = require('../../models/WaitingProject')
 //----------------//
 //所有项目列表---测试使用
 router.get('/list', async (req, res) => {
@@ -14,7 +15,7 @@ router.get('/list', async (req, res) => {
     res.send(projects);
 })
 //删除所有项目---测试使用
-router.delete('/delete', async (req, res) => {
+router.get('/delete', async (req, res) => {
     var result = await Project.remove();
     res.send(result);
 })
@@ -29,7 +30,7 @@ router.get('/item/list', async (req, res) => {
     res.send(config);
 })
 //删除传感器信息
-router.delete('/sensor/delete', async (req, res) => {
+router.get('/sensor/delete', async (req, res) => {
     const result = await Sensor.remove();
     res.send(result);
 })
@@ -58,12 +59,51 @@ router.post('/create', auth_middleware, async (req, res) => {
     req.body.ownerId = req.user._id;
     const newProject = await Project.create(req.body);
     assert(newProject, 500, "创建出错，请稍后再试");
-    let userId = req.user.id;
+    // 将项目加入到用户项目列表中
+    let userId = req.user._id;
     let ids = req.user.projects_id;
     ids.push(newProject._id);
     const addFlag = await User.findByIdAndUpdate(userId, { projects_id: ids });
     assert(addFlag, 500, "服务器错误，请重试");
+    // 将项目加入到等待授权项目列表中
+    let body = {};
+    body.createTime = new Date();
+    body.projectId = newProject._id;
+    body.userId = req.user._id;
+    body.userName = req.user.userName;
+    body.projectName = newProject.projectName;
+    const waiting = await WaitingProject.create(body)
+    assert(waiting, 500, "服务器错误")
     res.send(newProject);
+})
+// 删除项目
+router.delete('/:id', auth_middleware, has_project_auth_middleware, async (req, res) => {
+    const projectId = req.params.id;
+    await Project.findByIdAndDelete(projectId);
+    await Apply.remove({ "project_id": projectId });
+    await WaitingProject.findOneAndDelete({ "projectId": projectId });
+    let userId = req.user._id;
+    let ids = [];
+    req.user.projects_id.forEach(id => {
+        if (id.toString() !== projectId.toString()) {
+            ids.push(id)
+        }
+    });
+    const decFlag = await User.findByIdAndUpdate(userId, { projects_id: ids });
+    assert(decFlag, 500, "删除出错");
+    res.send("ok");
+})
+//判断项目是否可使用
+router.get('/:id/operation', auth_middleware, async (req, res) => {
+    const id = req.params.id;
+    const project = await Project.findById({ "_id": id });
+    res.send(project.operationFlag || false);
+})
+//判断项目是否开放
+router.get('/:id/openstatus', auth_middleware, async (req, res) => {
+    const id = req.params.id;
+    const project = await Project.findById({ "_id": id });
+    res.send(project.openStatus || false);
 })
 //用户项目列表
 router.get('/:userid/list', auth_middleware, async (req, res) => {
@@ -73,36 +113,8 @@ router.get('/:userid/list', auth_middleware, async (req, res) => {
             $match: { _id: { $in: ids } }
         }
     ])
-    let applyWaitProjects_ids = req.user.applyWaitProjects_id;
-    const applyWaitProjects = await Project.aggregate([
-        {
-            $match: { _id: { $in: applyWaitProjects_ids } }
-        }
-    ])
-    let authWaitProjects_ids = req.user.authWaitProjects_id;
-    const authWaitProjects = await Project.aggregate([
-        {
-            $match: { _id: { $in: authWaitProjects_ids } }
-        }
-    ])
-    let getAuthedProjects_ids = req.user.getAuthedProjects_id;
-    const getAuthedProjects = await Project.aggregate([
-        {
-            $match: { _id: { $in: getAuthedProjects_ids } }
-        }
-    ])
-    let getCheckedProjects_ids = req.user.getCheckedProjects_id;
-    const getCheckedProjects = await Project.aggregate([
-        {
-            $match: { _id: { $in: getCheckedProjects_ids } }
-        }
-    ])
     let result = {};
     result.projects = projects;
-    result.applyWaitProjects = applyWaitProjects;
-    result.authWaitProjects = authWaitProjects;
-    result.getAuthedProjects = getAuthedProjects;
-    result.getCheckedProjects = getCheckedProjects;
     res.send(result);
 })
 //开放项目列表
@@ -118,6 +130,16 @@ router.get('/opencount', async (req, res) => {
     res.send(count);
 })
 //获取项目基本信息
+router.get('/show/:id', auth_middleware, async (req, res) => {
+    const id = req.params.id;
+    const project = await Project.findOne({ "_id": id }, "projectName img province createdTime city address openStatus ownerId obj mtl");
+    assert(project, 404, "项目不存在");
+    if (project.openStatus === false) {
+        assert(false, 402, "项目未开放，没有操作权限")
+    }
+    res.send(project);
+})
+//获取项目详细信息
 router.get('/:id', auth_middleware, has_project_auth_middleware, async (req, res) => {
     const id = req.params.id;
     const project = await Project.findById(id);
@@ -211,6 +233,39 @@ router.get('/:id/sensor', auth_middleware, has_project_auth_middleware, async (r
     const sensorData = await Sensor.find({ "projectId": id });
     assert(sensorData, 500, "查询节点信息出错，请稍后再试");
     res.send(sensorData);
+})
+//授权用户获取测点数据
+router.get('/:id/authsensor', auth_middleware, async (req, res) => {
+    const userId = req.user._id;
+    const id = req.params.id;
+    const tmps = await Apply.find({ "project_id": id });
+    let flag = false;
+    tmps.some(item => {
+        if (item.user_id.toString() === userId.toString()) { flag = true; return; }
+    });
+    assert(flag, 401, "没有权限查看")
+    const sensorData = await Sensor.find({ "projectId": id });
+    assert(sensorData, 500, "查询节点信息出错，请稍后再试");
+    // 格式化数据，使授权用户只能看到部分数据
+    let tableData = []
+    sensorData.forEach(planes => {
+        let plane = planes.name;
+        planes.children.forEach(sites => {
+            let site = sites.name;
+            sites.value.forEach(points => {
+                let tmpdata = {};
+                tmpdata.ratio = points.ratio;
+                tmpdata.name = points.name;
+                tmpdata.type = points.type;
+                tmpdata.unit = points.unit;
+                tmpdata.value = points.value;
+                tmpdata.site = site;
+                tmpdata.plane = plane;
+                tableData.push(tmpdata);
+            });
+        });
+    });
+    res.send(tableData);
 })
 //添加项目测区布置数据
 router.post('/:id/importplane', auth_middleware, has_project_auth_middleware, async (req, res) => {

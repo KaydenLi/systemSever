@@ -4,13 +4,13 @@ const Post = require('../../models/Post')
 
 //获取通告列表
 router.get('/lists', async (req, res) => {
-    const posts = await Post.find();
+    const posts = await Post.find().sort({ 'createTime': -1 });
     res.send(posts)
 })
 
 //获取通告列表
 router.get('/list', async (req, res) => {
-    const posts = await Post.find().limit(5);
+    const posts = await Post.find().sort({ 'createTime': -1 }).limit(5);
     res.send(posts)
 })
 
