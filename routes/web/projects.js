@@ -146,6 +146,20 @@ router.get('/:id', auth_middleware, has_project_auth_middleware, async (req, res
     assert(project, 500, "服务器错误");
     res.send(project);
 })
+//获取项目综合阈值信息
+router.get('/:id/estimation', auth_middleware, has_project_auth_middleware, async (req, res) => {
+    const id = req.params.id;
+    const project = await Project.findById(id);
+    assert(project, 500, "服务器错误");
+    res.send(project);
+})
+//获取项目剩余寿命信息
+router.get('/:id/lifeestimation', auth_middleware, has_project_auth_middleware, async (req, res) => {
+    const id = req.params.id;
+    const project = await Project.findById(id);
+    assert(project, 500, "服务器错误");
+    res.send(project);
+})
 //更新项目基本信息
 router.post('/:id/update', auth_middleware, has_project_auth_middleware, async (req, res) => {
     const id = req.params.id;
