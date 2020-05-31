@@ -23,10 +23,6 @@ const schema = new mongoose.Schema({
     email: { type: String, default: "" },//邮箱
     img: { type: String, default: "https://cn.vuejs.org/images/logo.png" },//头像
     projects_id: { type: Array },//所拥有的项目的id列表
-    applyWaitProjects_id: { type: Array, default: [] },//正在申请查看项目id列表
-    authWaitProjects_id: { type: Array, default: [] },//等待授权项目id列表
-    getAuthedProjects_id: { type: Array, default: [] },//已获取授权项目id列表
-    getCheckedProjects_id: { type: Array, default: [] }//已授权开放项目id列表
 })
 
 module.exports = mongoose.model('User', schema, 'users')

@@ -17,11 +17,25 @@ const schema = new mongoose.Schema({
     mtl: { type: String },//mtl文件地址
     structuralType: { type: String },//结构类型
     createdTime: { type: Date },//创建时间
+    threshlod: {
+        strength: { type: Number, default: 0 },
+        limit: { type: Number, default: 0 },
+        rate: { type: Number, default: 0 },
+        absolute: { type: Number, default: 0 }
+    },//阈值
     openStatus: { type: Boolean, default: false },//开放状态
     operationFlag: { type: Boolean, default: false },
     watchersId: { type: Number, default: 0 },//获得授权者
     img: { type: String },//项目图片
     planeId: { type: Array },//测区
+    estimationInfo: {
+        statusLevel: { type: String, default: "A" },
+        damage: { type: String, default: "1" }
+    },
+    lifeEstimationInfo: {
+        statusLevel: { type: String, default: "A" },
+        damage: { type: String, default: "1" }
+    },
     baseInfo: [
         {
             name: { type: String },

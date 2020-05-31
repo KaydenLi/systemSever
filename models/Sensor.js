@@ -24,7 +24,7 @@ const schema = new mongoose.Schema({
                 type: { type: String },
                 group: { type: Array, default: [] },
                 unit: { type: String },
-                value: { type: Array, default: [0,0,0,0,0,0,0,0,0,0] }
+                value: { type: Array, default: [60, 65, 70, 70, 70, 65, 65, 64, 64, 63, 65, 66, 68, 76, 60, 60, 65, 63, 65, 66, 68, 76, 60] }
             }
         ]
     }]
